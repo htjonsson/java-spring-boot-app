@@ -10,6 +10,9 @@ https://docs.oracle.com/javase/tutorial/uiswing/components/tree.html <br/>
 http://dev.cs.ovgu.de/java/Books/JDCBook/swing2.html <br/>
 http://dev.cs.ovgu.de/java/Books/SwingBook/ <br/>
 
+<h3>JTable</h3>
+https://www.codejava.net/java-se/swing/setting-column-width-and-row-height-for-jtable <br/>
+
 <hr/>
 <h3>JSON</h3>
 https://medium.com/@bubu.tripathy/json-serialization-and-deserialization-in-java-2a3f08266b70<br/>
