@@ -1,4 +1,4 @@
-(https://github.com/HaikuArchives/Paladin <br/>
+https://github.com/HaikuArchives/Paladin <br/>
 <br/>
 https://www.geeksforgeeks.org/how-to-read-and-write-json-files-in-java/ <br/>
 https://www.baeldung.com/java-validation <br/>
@@ -20,4 +20,10 @@ https://medium.com/@bubu.tripathy/json-serialization-and-deserialization-in-java
 https://blogs.oracle.com/javamagazine/post/java-json-serialization-jackson <br/>
 https://www.baeldung.com/jackson-object-mapper-tutorial <br/>
 https://www.baeldung.com/java-serialization-approaches <br/>
-https://www.digitalocean.com/community/tutorials/java-json-example <br/>)
+https://www.digitalocean.com/community/tutorials/java-json-example <br/>
+
+<hr/>
+<h3>DRAWING</h3>
+https://www.baeldung.com/java-check-if-two-rectangles-overlap<br/>
+https://www.haiku-os.org/docs/api/group__interface.html<br/>
+https://math.hws.edu/eck/cs124/javanotes4/source/RubberBand.java<br/>
