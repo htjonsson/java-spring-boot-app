@@ -1,6 +1,8 @@
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.*;
+import java.util.*;
 
 // https://www.codejava.net/java-se/swing/a-simple-jtable-example-for-display
 // https://www.codejava.net/java-se/swing/setting-column-width-and-row-height-for-jtable
@@ -41,7 +43,12 @@ public class PropertyWindow extends JFrame
             @Override
             public boolean isCellEditable(int row, int column)
             {
-                return false;
+                if (row < 6) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
             }
             @Override
             public Class<?> getColumnClass(int columnIndex)
@@ -50,23 +57,31 @@ public class PropertyWindow extends JFrame
             }
         };
 
+        ArrayList<String> listCountry = new ArrayList<>();
+        listCountry.add(new String("USA"));
+        listCountry.add(new String("UK"));
+        listCountry.add(new String("Japan"));
+        listCountry.add(new String("South Korea"));
+        listCountry.add(new String("Canada"));
+
         JTable propertyTable = new JTable(model);
         propertyTable.setRowHeight(22);
         propertyTable.setDefaultRenderer(String.class, new CustomDateCellRenderer());
+        propertyTable.setDefaultEditor(String.class, new CountryCellEditor(listCountry));
         propertyTable.getTableHeader().setUI(null);
 
         // -------------------------------------------------------------------------
 
-        final DefaultComboBoxModel fruitsName = new DefaultComboBoxModel();
+        final DefaultComboBoxModel classNames = new DefaultComboBoxModel();
 
-        fruitsName.addElement("Apple");
-        fruitsName.addElement("Grapes");
-        fruitsName.addElement("Mango");
-        
-        fruitsName.addElement("Peer");
-        String[] comboboxStrings = { "Bird", "Cat", "Dog", "Rabbit", "Pig" };
+        classNames.addElement("XmPushButton");
+        classNames.addElement("XmLabel");
+        classNames.addElement("XmPrimitive");
+        classNames.addElement("Core");
+        classNames.addElement("Rect");
+        classNames.addElement("Object");
 
-        JComboBox combobox = new JComboBox(fruitsName);
+        JComboBox combobox = new JComboBox(classNames);
 
         // -------------------------------------------------------------------------
 
@@ -91,10 +106,6 @@ public class PropertyWindow extends JFrame
     
         this.add(combobox, BorderLayout.NORTH);
         this.add(tabbedPane, BorderLayout.CENTER);
-
-        // this.setMargin(new Insets(50, 50, 50, 50));
-
-        // this.add(new JScrollPane(table), BorderLayout.CENTER);
 
         // -------------------------------------------------------------------------
 
@@ -142,7 +153,7 @@ class CustomDateCellRenderer extends DefaultTableCellRenderer{
         Component cellComponent = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);    
 
         if(value instanceof String){
-            System.out.println("row: " + row + " column: " + column);
+            // System.out.println("row: " + row + " column: " + column);
             // this is where I display the age from the value variable
         }
 
@@ -155,7 +166,53 @@ class CustomDateCellRenderer extends DefaultTableCellRenderer{
             cellComponent.setForeground(Color.blue);
         }
 
-
         return cellComponent;
+    }
+}
+
+class CountryCellEditor extends AbstractCellEditor implements TableCellEditor, ActionListener {
+    private String country;
+    private ArrayList<String> listCountry;
+     
+    public CountryCellEditor(ArrayList<String> listCountry) {
+        this.listCountry = listCountry;
+    }
+     
+    @Override
+    public Object getCellEditorValue() {
+        return this.country;
+    }
+ 
+    @Override
+    public Component getTableCellEditorComponent(JTable table, Object value,
+            boolean isSelected, int row, int column) {
+        System.out.println("row: " + row + " column: " + column);
+
+        if (value instanceof String) {
+            this.country = (String) value; 
+        }
+         
+        JComboBox<String> comboCountry = new JComboBox<String>();
+         
+        for (String aCountry : listCountry) {
+            comboCountry.addItem(aCountry);
+        }
+         
+        comboCountry.setSelectedItem(country);
+        comboCountry.addActionListener(this);
+         
+        if (isSelected) {
+            // comboCountry.setBackground(table.getSelectionBackground());
+        } else {
+            // comboCountry.setBackground(table.getSelectionForeground());
+        }
+         
+        return comboCountry;
+    }
+ 
+    @Override
+    public void actionPerformed(ActionEvent event) {
+        JComboBox<String> comboCountry = (JComboBox<String>) event.getSource();
+        this.country = (String) comboCountry.getSelectedItem();
     }
 }
