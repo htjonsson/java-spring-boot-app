@@ -43,17 +43,28 @@ public class PropertyWindow extends JFrame
             @Override
             public boolean isCellEditable(int row, int column)
             {
-                if (row < 6) {
-                    return true;
-                }
-                else {
+                if (column != 1) {
                     return false;
                 }
+
+                return true;
             }
             @Override
             public Class<?> getColumnClass(int columnIndex)
             {
                 return columnClass[columnIndex];
+            }
+            @Override
+            public Object getValueAt(int rowIndex, int columnIndex) {
+                Object value = super.getValueAt(rowIndex, columnIndex);
+
+                System.out.println("[getValue] " + value.toString());
+                return value;
+            }
+            @Override
+            public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+                System.out.println("[setValue]" + aValue.toString());
+                super.setValueAt(aValue, rowIndex, columnIndex);
             }
         };
 
@@ -67,7 +78,7 @@ public class PropertyWindow extends JFrame
         JTable propertyTable = new JTable(model);
         propertyTable.setRowHeight(22);
         propertyTable.setDefaultRenderer(String.class, new CustomDateCellRenderer());
-        propertyTable.setDefaultEditor(String.class, new CountryCellEditor(listCountry));
+        propertyTable.setDefaultEditor(String.class, new CustomCellEditor(listCountry));
         propertyTable.getTableHeader().setUI(null);
 
         // -------------------------------------------------------------------------
@@ -111,8 +122,9 @@ public class PropertyWindow extends JFrame
 
         this.setTitle("Object Inspector");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(320, 500);
-        // this.pack();
+        this.setSize(600, 280);
+        // this.setPreferredSize(new Dimension(800,250));
+        this.pack();
         this.setVisible(true);
     }
 
@@ -126,9 +138,9 @@ public class PropertyWindow extends JFrame
 
                     // UIManager.setLookAndFeel("javax.swing.plaf.basic.BasicLookAndFeel");
                     // UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName()); 
-                    UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel"); 
+                    // UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel"); 
                     // UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
-                    // UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+                    UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
 
                     // MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
                 } 
@@ -170,49 +182,151 @@ class CustomDateCellRenderer extends DefaultTableCellRenderer{
     }
 }
 
-class CountryCellEditor extends AbstractCellEditor implements TableCellEditor, ActionListener {
-    private String country;
-    private ArrayList<String> listCountry;
-     
-    public CountryCellEditor(ArrayList<String> listCountry) {
-        this.listCountry = listCountry;
+class CustomCellTextChooser {
+    private JTextField _textField = new JTextField();
+
+    public CustomCellTextChooser(ActionListener actionListener) {
+        _textField.addActionListener(actionListener);
+    }
+
+    public Component getTableCellEditorComponent(JTable table, int row, int column) {
+        _textField.setText("JTextField");
+
+        return _textField;
+    }   
+}
+
+class CustomCellOptionChooser {
+    private ArrayList<String> _stringList = new ArrayList();
+    private JComboBox<String> _comboBox = new JComboBox<String>();
+    private ActionListener _actionListener;
+
+    public CustomCellOptionChooser(ArrayList<String> stringList, ActionListener actionListener) {
+        for (String stringValue : stringList) {
+            _comboBox.addItem(stringValue);
+        }        
+        _comboBox.addActionListener(actionListener);
+    }
+
+    public Component getTableCellEditorComponent(JTable table, int row, int column) {
+        return _comboBox;
+    }
+}
+
+class CustomCellColorChooser {
+    private JColorChooser   _colorChooser;
+    private JDialog         _dialog;
+    private JLabel          _label;
+    private Color           _currentColor;   
+
+    public CustomCellColorChooser(ActionListener okListener) {
+        _label = new JLabel();
+        _colorChooser = new JColorChooser();
+        _dialog = JColorChooser.createDialog(_label,
+                                    "Pick a Color",
+                                    true,  //modal
+                                    _colorChooser,
+                                    okListener,  //OK button handler
+                                    null); //no CANCEL button handler   
+        // _label.setActionCommand("CustomCellColorChooser");    
+    }
+
+    public void setCurrentColor(Color color) {
+        _currentColor = color;
+    }
+
+    public Color getCurrentColor() {
+        return _currentColor;
+    }
+
+    public Component getTableCellEditorComponent(JTable table, int row, int column) {
+        _colorChooser.setColor(_currentColor);
+
+        // _dialog.setLocationRelativeTo(_button);
+            
+        setLocation(table, row, column);
+            
+        _dialog.setVisible(true);    
+  
+        return _label;
+    }
+
+    private void setLocation(JTable table, int row, int column) {
+        Rectangle cellRectangle = table.getCellRect(row, column, true);
+
+        Point tableLocationOnScreen = table.getLocationOnScreen();
+
+        _dialog.setLocation((int)(cellRectangle.getX() + tableLocationOnScreen.getX()), 
+                            (int)(cellRectangle.getY() + tableLocationOnScreen.getY()));
+
+        // System.out.println("locationOnScreen [x,y] [" + table.getLocationOnScreen().getX() + "," + table.getLocationOnScreen().getY()  + "]");
+        // System.out.println("table [x,y] [" + table.getX() + "," + table.getY() + "]");
+        // System.out.println("cell [x,y] [" + cellRectangle.getX() + "," + cellRectangle.getY() + "]");
+    }
+}
+
+class CustomCellEditor extends AbstractCellEditor implements TableCellEditor, ActionListener {
+    private CustomCellColorChooser  _colorChooser;
+    private CustomCellOptionChooser _optionChooser;
+    private CustomCellTextChooser   _textChooser;
+
+    public CustomCellEditor(ArrayList<String> stringList) {
+        _colorChooser = new CustomCellColorChooser(this);
+        _optionChooser = new CustomCellOptionChooser(stringList, this);
+        _textChooser = new CustomCellTextChooser(this);
     }
      
     @Override
     public Object getCellEditorValue() {
-        return this.country;
+        System.out.println("[getCellEditorValue]");
+
+        return "Object";
+        // return this.cellValue;
+        // return this.currentColor.toString();
     }
  
     @Override
-    public Component getTableCellEditorComponent(JTable table, Object value,
-            boolean isSelected, int row, int column) {
-        System.out.println("row: " + row + " column: " + column);
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+        System.out.println("[row,column] " + "[" + row + "," + column + "]");
 
-        if (value instanceof String) {
-            this.country = (String) value; 
+        if (row == 0) {
+            return _optionChooser.getTableCellEditorComponent(table, row, column);    
         }
-         
-        JComboBox<String> comboCountry = new JComboBox<String>();
-         
-        for (String aCountry : listCountry) {
-            comboCountry.addItem(aCountry);
+        if (row == 1) {
+            return _colorChooser.getTableCellEditorComponent(table, row, column);
         }
-         
-        comboCountry.setSelectedItem(country);
-        comboCountry.addActionListener(this);
-         
-        if (isSelected) {
-            // comboCountry.setBackground(table.getSelectionBackground());
-        } else {
-            // comboCountry.setBackground(table.getSelectionForeground());
-        }
-         
-        return comboCountry;
+        
+        return _textChooser.getTableCellEditorComponent(table, row, column);
     }
  
     @Override
     public void actionPerformed(ActionEvent event) {
-        JComboBox<String> comboCountry = (JComboBox<String>) event.getSource();
-        this.country = (String) comboCountry.getSelectedItem();
+        System.out.println("[actionCommand] [" + event.getActionCommand() + "]");
+        System.out.println(event.getSource().getClass().getName());
+
+        /*
+        if (EDIT.equals(event.getActionCommand())) {
+            System.out.println("[actionPerformed::edit]");
+            // fireEditingStopped(); //Make the renderer reappear.
+        } 
+        else { //User pressed dialog's "OK" button.
+            System.out.println("[actionPerformed::getColor]");
+            // currentColor = colorChooser.getColor();
+            // System.out.println("[currentColor] " + currentColor.toString());
+        }
+        */
+
+        if (event.getSource() instanceof CustomCellColorChooser) {
+            System.out.println("instanceof CustomCellColorChooser");
+        }
+
+        fireEditingStopped();
+
+        // JButton btn = (JButton) event.getSource();
+
+        // System.out.println("Button x: " + btn.getLocation().getX());
+
+        // JComboBox<String> comboCountry = (JComboBox<String>) event.getSource();
+        // this.country = (String) comboCountry.getSelectedItem();
     }
 }
