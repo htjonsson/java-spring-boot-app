@@ -30,3 +30,9 @@ https://www.digitalocean.com/community/tutorials/java-json-example <br/>
 https://www.baeldung.com/java-check-if-two-rectangles-overlap<br/>
 https://www.haiku-os.org/docs/api/group__interface.html<br/>
 https://math.hws.edu/eck/cs124/javanotes4/source/RubberBand.java<br/>
+
+<hr/>
+https://www.geeksforgeeks.org/java/spring-boot-crud-operations/<br/>
+https://www.baeldung.com/spring-rest-openapi-documentation<br/>
+https://www.baeldung.com/spring-boot-sqlite<br/>
+https://www.geeksforgeeks.org/java/spring-boot-file-handling/<br/>
